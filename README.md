@@ -30,6 +30,7 @@ Each component has `POST /v1/<operation>` accepting its JSON request object. Res
 | `collation` | Actual system ICU comparison and sort keys with locale, strength and ICU collation-version tags. |
 | `regex` | A restricted Thompson NFA with alternatives, groups, dot and quantifiers, including chunked full matching. |
 | `documentpath` | A bounded JSONPath subset with object fields, array indexes and wildcards. |
+| `documentconvert` | Chunked streaming conversion of JSON documents into flat records with a declared path-to-field schema, explicit zip/separate array expansion and locatable rejections. |
 | `datalog` | Finite positive recursion and stratified negation with safety validation and a work budget. |
 | `boolean` | Ordered reduced decision diagrams, logical operations, existential quantification and witnesses. |
 
@@ -46,7 +47,7 @@ Use one operation request from that output as the JSON body for its `/v1/<operat
 
 ## Supported scope
 
-ICU is a system dependency: macOS libicucore or Linux ICU i18n. Profiles report ICU fallback warnings and keys with different complete profiles are rejected. Regex supports no backreferences, lookaround, character classes or capture extraction. Document selection uses a bounded DOM, not a streaming parser; duplicate object keys are rejected. Datalog uses ground scalar facts, safe finite rules and full recomputation for fact changes. Boolean node IDs belong to their creating manager and must never be mixed across managers.
+ICU is a system dependency: macOS libicucore or Linux ICU i18n. Profiles report ICU fallback warnings and keys with different complete profiles are rejected. Regex supports no backreferences, lookaround, character classes or capture extraction. Document selection uses a bounded DOM, not a streaming parser; duplicate object keys are rejected. Document conversion accepts the source in chunks with bounded parse stack, mapping state, capture work and staging queues; sibling arrays expand only as declared (zip alignment with per-frame cardinality checks, or separate record streams), never as a silent Cartesian product. Records keep null and missing distinct, and output produced before a successful finish is candidate data that any document failure (truncation, malformed input, duplicate keys, budget excess) revokes with a locatable error. Datalog uses ground scalar facts, safe finite rules and full recomputation for fact changes. Boolean node IDs belong to their creating manager and must never be mixed across managers.
 
 Runtime state uses explicit temporary directories or caller-provided library objects. Service examples are per-request computations; use the library interfaces for persistent state and long-lived readers.
 
